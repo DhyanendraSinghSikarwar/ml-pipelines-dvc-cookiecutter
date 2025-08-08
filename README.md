@@ -57,5 +57,6 @@ To setup cookiecutter ,
 command: cookiecutter -c v1 https://github.com/drivendata/cookiecutter-data-science
 
 To add tag in git: git tag -a v2.0 -m 'Release V2 TfIdf'
+to change/reach the tag version:git checkout tags/v2.0
 --------
 <p><small>Project based on the <a target="_blank" href="https://drivendata.github.io/cookiecutter-data-science/">cookiecutter data science project template</a>. #cookiecutterdatascience</small></p>
