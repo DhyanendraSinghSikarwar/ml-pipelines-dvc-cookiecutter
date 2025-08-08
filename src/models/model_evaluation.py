@@ -15,7 +15,7 @@ def load_model():
 def load_data():
     # fetch the data from data/features
     try:
-        test_data = pd.read_csv('./data/features/test_bow.csv')
+        test_data = pd.read_csv('./data/features/test_tfidf.csv')
     except FileNotFoundError as e:
         print(f"Error loading data: {e}")
         return pd.DataFrame()

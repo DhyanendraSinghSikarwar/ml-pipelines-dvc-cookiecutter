@@ -3,7 +3,7 @@ import numpy as np
 import os
 import yaml
 
-from sklearn.feature_extraction.text import CountVectorizer
+from sklearn.feature_extraction.text import TfidfVectorizer
 
 def load_params():
     return yaml.safe_load(open('params.yaml', 'r'))
@@ -40,22 +40,22 @@ def preprocess_features(train_data: pd.DataFrame, test_data: pd.DataFrame) -> tu
     return X_train, y_train, X_test, y_test
 
 
-def apply_bow(X_train: np.ndarray, X_test: np.ndarray, max_features: int) -> tuple:
-    # Apply Bag of Words
-    vectorizer = CountVectorizer(max_features=max_features)
+def apply_tfidf(X_train: np.ndarray, X_test: np.ndarray, max_features: int) -> tuple:
+    # Apply TF-IDF
+    vectorizer = TfidfVectorizer(max_features=max_features)
 
     # Fit and transform the training data, transform the test data
-    X_train_bow = vectorizer.fit_transform(X_train)
-    X_test_bow = vectorizer.transform(X_test)
+    X_train_tfidf = vectorizer.fit_transform(X_train)
+    X_test_tfidf = vectorizer.transform(X_test)
 
-    return X_train_bow, X_test_bow, vectorizer
+    return X_train_tfidf, X_test_tfidf, vectorizer
 
 
-def convert_to_dataframe(X_train_bow: np.ndarray, X_test_bow: np.ndarray, y_train: np.ndarray, y_test: np.ndarray, vectorizer: CountVectorizer) -> tuple:
+def convert_to_dataframe(X_train_tfidf: np.ndarray, X_test_tfidf: np.ndarray, y_train: np.ndarray, y_test: np.ndarray, vectorizer: TfidfVectorizer) -> tuple:
     # Convert to DataFrame
-    train_df = pd.DataFrame(X_train_bow.toarray(), columns=vectorizer.get_feature_names_out())
+    train_df = pd.DataFrame(X_train_tfidf.toarray(), columns=vectorizer.get_feature_names_out())
     train_df['label'] = y_train
-    test_df = pd.DataFrame(X_test_bow.toarray(), columns=vectorizer.get_feature_names_out())
+    test_df = pd.DataFrame(X_test_tfidf.toarray(), columns=vectorizer.get_feature_names_out())
     test_df['label'] = y_test
     return train_df, test_df
 
@@ -64,8 +64,8 @@ def convert_to_dataframe(X_train_bow: np.ndarray, X_test_bow: np.ndarray, y_trai
 def save_data(data_path: str, train_df: pd.DataFrame, test_df: pd.DataFrame) -> None:
     os.makedirs(data_path, exist_ok=True)
     try:
-        train_df.to_csv(os.path.join(data_path, 'train_bow.csv'), index=False)
-        test_df.to_csv(os.path.join(data_path, 'test_bow.csv'), index=False)
+        train_df.to_csv(os.path.join(data_path, 'train_tfidf.csv'), index=False)
+        test_df.to_csv(os.path.join(data_path, 'test_tfidf.csv'), index=False)
     except Exception as e:
         print(f"Error saving data: {e}")
 
@@ -84,12 +84,12 @@ def main():
     # Preprocess features
     X_train, y_train, X_test, y_test = preprocess_features(train_data, test_data)
 
-    # Apply BOW
-    X_train_bow, X_test_bow, vectorizer = apply_bow(X_train, X_test, max_features)
+    # Apply TF-IDF
+    X_train_tfidf, X_test_tfidf, vectorizer = apply_tfidf(X_train, X_test, max_features)
 
     # Convert to DataFrame
-    train_df, test_df = convert_to_dataframe(X_train_bow, X_test_bow, y_train, y_test, vectorizer)
-    
+    train_df, test_df = convert_to_dataframe(X_train_tfidf, X_test_tfidf, y_train, y_test, vectorizer)
+
     data_path = os.path.join('data', 'features')
     # Save the processed data
     save_data(data_path, train_df, test_df)

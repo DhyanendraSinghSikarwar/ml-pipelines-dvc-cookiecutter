@@ -12,7 +12,7 @@ def load_params():
 def load_data():
     # fetch the data from data/features
     try:
-        train_data = pd.read_csv('./data/features/train_bow.csv')
+        train_data = pd.read_csv('./data/features/train_tfidf.csv')
     except FileNotFoundError as e:
         print(f"Error loading data: {e}")
         return pd.DataFrame()
