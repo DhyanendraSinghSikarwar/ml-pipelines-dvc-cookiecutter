@@ -1,0 +1,4 @@
+[core]
+    remote = myremote
+['remote "myremote"']
+    url = /home/dev37/Documents/campusx/storage-for-dvc-demo
