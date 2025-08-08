@@ -70,7 +70,7 @@ def save_metrics(accuracy: float, precision: float, recall: float, auc: float) -
         'auc': auc
     }
     
-    with open('metrics.json', 'w') as file:
+    with open('reports/metrics.json', 'w') as file:
         json.dump(metrics_dict, file, indent=4)
 
 

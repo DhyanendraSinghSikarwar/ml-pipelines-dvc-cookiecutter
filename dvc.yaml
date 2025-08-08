@@ -39,4 +39,4 @@ stages:
     - model_building.n_estimators
     - model_building.learning_rate
     metrics:
-    - metrics.json
+    - reports/metrics.json
