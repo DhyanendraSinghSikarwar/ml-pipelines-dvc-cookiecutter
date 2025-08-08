@@ -4,6 +4,9 @@ import os
 import yaml
 
 from sklearn.feature_extraction.text import TfidfVectorizer
+from src.utils import setup_logging
+
+logger = setup_logging(__name__)
 
 def load_params():
     return yaml.safe_load(open('params.yaml', 'r'))
@@ -14,16 +17,18 @@ def load_data():
     try:
         train_data = pd.read_csv('./data/processed/train_processed.csv')
         test_data = pd.read_csv('./data/processed/test_processed.csv')
+        logger.info("Data loaded successfully.")
     except FileNotFoundError as e:
-        print(f"Error loading data: {e}")
+        logger.error(f"Error loading data: {e}")
         return pd.DataFrame(), pd.DataFrame()
     except Exception as e:
-        print(f"Unexpected error: {e}")
+        logger.error(f"Unexpected error: {e}")
         return pd.DataFrame(), pd.DataFrame()
     # Ensure the data is not empty
     if train_data.empty or test_data.empty:
-        print("Data files are empty.")
+        logger.warning("Data files are empty.")
         return pd.DataFrame(), pd.DataFrame()
+    logger.info("Data loaded successfully.")
     return train_data, test_data
 
 
@@ -47,6 +52,7 @@ def apply_tfidf(X_train: np.ndarray, X_test: np.ndarray, max_features: int) -> t
     # Fit and transform the training data, transform the test data
     X_train_tfidf = vectorizer.fit_transform(X_train)
     X_test_tfidf = vectorizer.transform(X_test)
+    logger.info("TF-IDF transformation completed.")
 
     return X_train_tfidf, X_test_tfidf, vectorizer
 
@@ -66,8 +72,9 @@ def save_data(data_path: str, train_df: pd.DataFrame, test_df: pd.DataFrame) -> 
     try:
         train_df.to_csv(os.path.join(data_path, 'train_tfidf.csv'), index=False)
         test_df.to_csv(os.path.join(data_path, 'test_tfidf.csv'), index=False)
+        logger.info("Feature data saved successfully.")
     except Exception as e:
-        print(f"Error saving data: {e}")
+        logger.error(f"Error saving data: {e}")
 
 
 def main():
@@ -75,7 +82,7 @@ def main():
     try:
         max_features = params['feature_engineering']['max_features']
     except KeyError as e:
-        print(f"Parameter missing in params.yaml: {e}")
+        logger.error(f"Parameter missing in params.yaml: {e}")
         return
 
     # fetch the data from data/processed
@@ -93,6 +100,7 @@ def main():
     data_path = os.path.join('data', 'features')
     # Save the processed data
     save_data(data_path, train_df, test_df)
+    logger.info("Feature engineering completed successfully.")
 
 if __name__ == "__main__":
     main()

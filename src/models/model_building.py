@@ -4,6 +4,9 @@ import pickle
 import yaml
 
 from sklearn.ensemble import GradientBoostingClassifier
+from src.utils import setup_logging
+
+logger = setup_logging(__name__)
 
 def load_params():
     return yaml.safe_load(open('params.yaml', 'r'))
@@ -14,15 +17,16 @@ def load_data():
     try:
         train_data = pd.read_csv('./data/features/train_tfidf.csv')
     except FileNotFoundError as e:
-        print(f"Error loading data: {e}")
+        logger.error(f"Error loading data: {e}")
         return pd.DataFrame()
     except Exception as e:
-        print(f"Unexpected error: {e}")
+        logger.error(f"Unexpected error: {e}")
         return pd.DataFrame()
     # Ensure the data is not empty
     if train_data.empty:
-        print("Data file is empty.")
+        logger.warning("Data file is empty.")
         return pd.DataFrame()
+    logger.info("Data loaded successfully.")
     return train_data
 
 
@@ -39,6 +43,7 @@ def model_building(params: dict, X_train: np.ndarray, y_train: np.ndarray) -> Gr
     
     # Train the model
     clf.fit(X_train, y_train)
+    logger.info("Model training completed.")
     
     return clf
 
@@ -47,6 +52,7 @@ def model_building(params: dict, X_train: np.ndarray, y_train: np.ndarray) -> Gr
 def save_model(model: GradientBoostingClassifier, filename: str) -> None:
     # Save the model
     pickle.dump(model, open(filename, 'wb'))
+    logger.info(f"Model saved to {filename}")
 
 
 def main():
@@ -64,6 +70,7 @@ def main():
 
     # Save model
     save_model(clf, 'models/model.pkl')
+    logger.info("Model building completed successfully.")
 
 if __name__ == "__main__":
     main()

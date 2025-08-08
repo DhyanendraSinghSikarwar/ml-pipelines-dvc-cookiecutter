@@ -8,6 +8,9 @@ import string
 from nltk.corpus import stopwords
 from nltk.stem import SnowballStemmer, WordNetLemmatizer
 from sklearn.feature_extraction.text import CountVectorizer
+from src.utils import setup_logging
+
+logger = setup_logging(__name__)
 
 # Download NLTK resources
 nltk.download('stopwords')
@@ -18,8 +21,9 @@ def load_data():
     try:
         train_data = pd.read_csv('./data/raw/train.csv')
         test_data = pd.read_csv('./data/raw/test.csv')
+        logger.info("Data loaded successfully.")
     except FileNotFoundError as e:
-        print(f"Error loading data: {e}")
+        logger.error(f"Error loading data: {e}")
         return pd.DataFrame(), pd.DataFrame()
     return train_data, test_data
 
@@ -64,10 +68,6 @@ def removing_urls(text: str) -> str:
     url_pattern = re.compile(r'https?://\S+|www\.\S+')
     return url_pattern.sub(r'', text)
 
-def remove_small_sentences(df: pd.DataFrame) -> None:
-    for i in range(len(df)):
-        if len(df.text.iloc[i].split()) < 3:
-            df.text.iloc[i] = np.nan
 
 def normalize_text(df: pd.DataFrame) -> pd.DataFrame:
     try:
@@ -78,13 +78,14 @@ def normalize_text(df: pd.DataFrame) -> pd.DataFrame:
         df.content = df.content.apply(lambda content: removing_urls(content))
         df.content = df.content.apply(lambda content: lemmatization(content))
     except Exception as e:
-        print(f"Error normalizing text: {e}")
+        logger.error(f"Error normalizing text: {e}")
     return df
 
 def save_processed_data(data_path: str, train_df: pd.DataFrame, test_df: pd.DataFrame) -> None:
     os.makedirs(data_path, exist_ok=True)
     train_df.to_csv(os.path.join(data_path, "train_processed.csv"), index=False)
     test_df.to_csv(os.path.join(data_path, "test_processed.csv"), index=False)
+    logger.info("Processed data saved successfully.")
 
 def main():
     # Load the data
@@ -98,7 +99,7 @@ def main():
     try:
         save_processed_data(data_path, train_processed_data, test_processed_data)
     except Exception as e:
-       print(f"Error saving processed data: {e}")
+       logger.error(f"Error saving processed data: {e}")
 
 if __name__ == "__main__":
     main()

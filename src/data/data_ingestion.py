@@ -5,22 +5,10 @@ import yaml
 import logging
 
 from sklearn.model_selection import train_test_split
+from src.utils import setup_logging
 
-logger = logging.getLogger('data_ingestion')
-logger.setLevel('DEBUG')
 
-console_handler = logging.StreamHandler()
-console_handler.setLevel('DEBUG')
-
-file_handler = logging.FileHandler('errors.log')
-file_handler.setLevel('ERROR')
-
-formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-console_handler.setFormatter(formatter)
-file_handler.setFormatter(formatter)
-
-logger.addHandler(file_handler)
-logger.addHandler(console_handler)
+logger = setup_logging(__name__)
 
 def load_params() -> float:
     try:
